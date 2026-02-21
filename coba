@@ -1,1 +1,1219 @@
-const TXT_URL = 'https://globaldenso.sharepoint.com/sites/AP000041/DNIA_Production_Control/Shared%20Documents/1.%20PC/1-1%20BEKASI/1-1-2%20MATERIAL%20CONTROL/FU-PROBLEM%20CONTROL/dashboard-data.txt';
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FU Problem Material Control - TXT Version</title>
+    
+    <!-- Bootstrap 5.3.2 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- DataTables -->
+    <link href="https://cdn.datatables.net/1.13.7/css/dataTables.bootstrap5.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome 6 -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+    
+    <!-- Google Fonts - Inter & Poppins -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Poppins:wght@500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000000;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .dashboard-container {
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+        
+        .header-gradient {
+            background: linear-gradient(135deg, #2c0b0b 0%, #4a1a1a 50%, #6b2b2b 100%);
+            padding: 30px;
+            border-radius: 24px;
+            margin-bottom: 25px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            border: 1px solid rgba(180, 80, 80, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-gradient::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -50%;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transform: skewX(-15deg);
+            animation: shine 8s infinite;
+        }
+        
+        @keyframes shine {
+            0% { left: -50%; }
+            20% { left: 100%; }
+            100% { left: 100%; }
+        }
+        
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .header-title h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 32px;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            letter-spacing: -0.5px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+        
+        .header-title p {
+            color: rgba(255,255,255,0.8);
+            margin: 8px 0 0 0;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+        
+        .header-title p i {
+            margin-right: 6px;
+            color: #ffa5a5;
+        }
+        
+        .auto-refresh-badge {
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(10px);
+            padding: 10px 20px;
+            border-radius: 50px;
+            border: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .auto-refresh-badge i {
+            color: #ffa5a5;
+            font-size: 16px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: #1a1a1a;
+            border-radius: 24px;
+            padding: 24px;
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            transition: all 0.3s ease;
+            box-shadow: 0 15px 30px -10px rgba(0, 0, 0, 0.5);
+        }
+        
+        .stat-card-total {
+            border: 2px solid #8b3a3a;
+            background: linear-gradient(145deg, #1e1e1e, #151515);
+        }
+        
+        .stat-card-open {
+            border: 2px solid #ffc107;
+            background: linear-gradient(145deg, #1e1e1e, #151515);
+        }
+        
+        .stat-card-progress {
+            border: 2px solid #17a2b8;
+            background: linear-gradient(145deg, #1e1e1e, #151515);
+        }
+        
+        .stat-card-closed {
+            border: 2px solid #28a745;
+            background: linear-gradient(145deg, #1e1e1e, #151515);
+        }
+        
+        .stat-card-total:hover {
+            border-color: #c44a4a;
+            box-shadow: 0 20px 35px -8px rgba(139, 58, 58, 0.4);
+            transform: translateY(-5px);
+        }
+        
+        .stat-card-open:hover {
+            border-color: #ffcd39;
+            box-shadow: 0 20px 35px -8px rgba(255, 193, 7, 0.4);
+            transform: translateY(-5px);
+        }
+        
+        .stat-card-progress:hover {
+            border-color: #3dd5f3;
+            box-shadow: 0 20px 35px -8px rgba(23, 162, 184, 0.4);
+            transform: translateY(-5px);
+        }
+        
+        .stat-card-closed:hover {
+            border-color: #34ce57;
+            box-shadow: 0 20px 35px -8px rgba(40, 167, 69, 0.4);
+            transform: translateY(-5px);
+        }
+        
+        .stat-icon-wrapper {
+            position: relative;
+        }
+        
+        .stat-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 30px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.5);
+        }
+        
+        .stat-card-total .stat-icon {
+            background: #8b3a3a;
+            color: white;
+        }
+        
+        .stat-card-open .stat-icon {
+            background: #ffc107;
+            color: #1a1a1a;
+        }
+        
+        .stat-card-progress .stat-icon {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .stat-card-closed .stat-icon {
+            background: #28a745;
+            color: white;
+        }
+        
+        .stat-content {
+            flex: 1;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        
+        .stat-card-total .stat-label {
+            color: #c44a4a;
+        }
+        
+        .stat-card-open .stat-label {
+            color: #ffc107;
+        }
+        
+        .stat-card-progress .stat-label {
+            color: #17a2b8;
+        }
+        
+        .stat-card-closed .stat-label {
+            color: #28a745;
+        }
+        
+        .stat-value {
+            font-size: 42px;
+            font-weight: 800;
+            line-height: 1;
+            margin-bottom: 8px;
+            color: white;
+            text-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+        
+        .stat-trend {
+            font-size: 12px;
+            font-weight: 500;
+            color: #aaa;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .stat-trend i {
+            font-size: 12px;
+        }
+        
+        .stat-card-total .stat-trend i {
+            color: #c44a4a;
+        }
+        
+        .stat-card-open .stat-trend i {
+            color: #ffc107;
+        }
+        
+        .stat-card-progress .stat-trend i {
+            color: #17a2b8;
+        }
+        
+        .stat-card-closed .stat-trend i {
+            color: #28a745;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .stat-card {
+            animation: fadeInUp 0.5s ease forwards;
+        }
+        
+        .stat-card:nth-child(1) { animation-delay: 0.1s; }
+        .stat-card:nth-child(2) { animation-delay: 0.2s; }
+        .stat-card:nth-child(3) { animation-delay: 0.3s; }
+        .stat-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        .filter-section {
+            background: #1a1a1a;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+        
+        .filter-label {
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #aaa;
+            margin-bottom: 8px;
+        }
+        
+        .filter-label i {
+            color: #c44a4a;
+            margin-right: 5px;
+        }
+        
+        .form-select, .form-control {
+            background: #2a2a2a;
+            border: 1px solid #404040;
+            color: white;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+        
+        .form-select:hover, .form-control:hover {
+            border-color: #8b3a3a;
+        }
+        
+        .form-select:focus, .form-control:focus {
+            background: #2a2a2a;
+            border-color: #c44a4a;
+            box-shadow: 0 0 0 3px rgba(196, 74, 74, 0.2);
+            color: white;
+        }
+        
+        .form-select option {
+            background: #2a2a2a;
+            color: white;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .btn-action {
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            background: #2a2a2a;
+            border: 1px solid #404040;
+            color: #c44a4a;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .btn-action:hover {
+            background: #8b3a3a;
+            border-color: #c44a4a;
+            color: white;
+            transform: translateY(-2px);
+        }
+        
+        .search-wrapper {
+            position: relative;
+        }
+        
+        .search-wrapper i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #aaa;
+            font-size: 14px;
+        }
+        
+        .search-wrapper input {
+            padding-left: 45px;
+            width: 280px;
+        }
+        
+        .table-wrapper {
+            background: #1a1a1a;
+            border-radius: 20px;
+            border: 1px solid #333;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+            overflow-y: visible;
+            max-width: 100%;
+            -webkit-overflow-scrolling: touch;
+        }
+        
+        .table-responsive::-webkit-scrollbar {
+            height: 8px;
+            background: #2a2a2a;
+        }
+        
+        .table-responsive::-webkit-scrollbar-thumb {
+            background: #8b3a3a;
+            border-radius: 4px;
+        }
+        
+        .table-responsive::-webkit-scrollbar-thumb:hover {
+            background: #c44a4a;
+        }
+        
+        .table {
+            margin: 0;
+            min-width: 1600px;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #1a1a1a;
+        }
+        
+        .table thead th {
+            background: #2a2a2a;
+            color: white;
+            font-weight: 600;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            padding: 16px 12px;
+            border-bottom: 2px solid #8b3a3a;
+            border-right: 1px solid #404040;
+            white-space: nowrap;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+        
+        .table thead th:last-child {
+            border-right: none;
+        }
+        
+        .table tbody td {
+            padding: 14px 12px;
+            font-size: 13px;
+            color: #e0e0e0;
+            border-bottom: 1px solid #333;
+            border-right: 1px solid #333;
+            vertical-align: middle;
+            background: #1a1a1a;
+        }
+        
+        .table tbody td:last-child {
+            border-right: none;
+        }
+        
+        .table tbody tr:hover td {
+            background: #2a2a2a;
+        }
+        
+        .badge-status {
+            padding: 6px 12px;
+            border-radius: 30px;
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        
+        .badge-open {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+        
+        .badge-progress {
+            background: rgba(23, 162, 184, 0.15);
+            color: #17a2b8;
+            border: 1px solid rgba(23, 162, 184, 0.3);
+        }
+        
+        .badge-closed {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+        
+        .due-date-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        
+        .due-date-danger {
+            background: rgba(220, 53, 69, 0.15);
+            color: #ff6b7a;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+        
+        .due-date-warning {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+        
+        .due-date-success {
+            background: rgba(40, 167, 69, 0.15);
+            color: #28a745;
+            border: 1px solid rgba(40, 167, 69, 0.3);
+        }
+        
+        .timing-badge {
+            padding: 4px 12px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+            white-space: nowrap;
+        }
+        
+        .timing-past {
+            background: rgba(220, 53, 69, 0.15);
+            color: #ff6b7a;
+            border: 1px solid rgba(220, 53, 69, 0.3);
+        }
+        
+        .timing-today {
+            background: rgba(255, 193, 7, 0.15);
+            color: #ffc107;
+            border: 1px solid rgba(255, 193, 7, 0.3);
+        }
+        
+        .btn-edit {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            background: transparent;
+            border: 1px solid #8b3a3a;
+            color: #c44a4a;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .btn-edit:hover {
+            background: #8b3a3a;
+            color: white;
+        }
+        
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            color: #aaa !important;
+            padding: 15px 20px !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            color: #aaa !important;
+            border: 1px solid #404040 !important;
+            background: #2a2a2a !important;
+            margin: 0 3px;
+            border-radius: 8px !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: #8b3a3a !important;
+            color: white !important;
+            border-color: #c44a4a !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: #8b3a3a !important;
+            color: white !important;
+            border-color: #c44a4a !important;
+        }
+        
+        .modal-content {
+            background: #1a1a1a;
+            border: 1px solid #8b3a3a;
+            border-radius: 20px;
+        }
+        
+        .modal-header {
+            background: linear-gradient(135deg, #2c0b0b 0%, #4a1a1a 100%);
+            color: white;
+            border-radius: 20px 20px 0 0;
+            padding: 20px 24px;
+            border: none;
+        }
+        
+        .modal-header .btn-close {
+            filter: brightness(0) invert(1);
+            opacity: 0.8;
+        }
+        
+        .modal-body {
+            padding: 24px;
+            color: #e0e0e0;
+        }
+        
+        .modal-body .form-label {
+            color: #aaa;
+            font-weight: 500;
+        }
+        
+        .modal-body .form-control {
+            background: #2a2a2a;
+            border: 1px solid #404040;
+            color: white;
+        }
+        
+        .modal-footer {
+            border-top: 1px solid #333;
+            padding: 16px 24px;
+        }
+        
+        .history-item {
+            background: #2a2a2a;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 8px;
+            border-left: 3px solid #8b3a3a;
+        }
+        
+        .dashboard-footer {
+            text-align: center;
+            margin-top: 25px;
+            color: #666;
+            font-size: 12px;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- HEADER -->
+        <div class="header-gradient">
+            <div class="header-content">
+                <div class="header-title">
+                    <h1>
+                        <i class="fas fa-clipboard-list me-3"></i>
+                        FU Problem Material Control
+                    </h1>
+                    <p>
+                        <span><i class="far fa-clock"></i> Update: <span id="last-update">-</span></span>
+                        <span><i class="fas fa-database"></i> Total: <span id="total-data">0</span></span>
+                    </p>
+                </div>
+                <div class="auto-refresh-badge">
+                    <i class="fas fa-sync-alt fa-spin"></i>
+                    <span>Auto Refresh 1 Menit</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- STATS CARDS -->
+        <div class="stats-grid">
+            <div class="stat-card stat-card-total">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon"><i class="fas fa-tasks"></i></div>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">TOTAL PROBLEM</div>
+                    <div class="stat-value" id="total-problem">0</div>
+                    <div class="stat-trend"><i class="fas fa-chart-line"></i> All Time</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-open">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon"><i class="fas fa-folder-open"></i></div>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">OPEN</div>
+                    <div class="stat-value" id="total-open">0</div>
+                    <div class="stat-trend"><i class="fas fa-lock"></i> Need Action</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-progress">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon"><i class="fas fa-spinner"></i></div>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">IN PROGRESS</div>
+                    <div class="stat-value" id="total-progress">0</div>
+                    <div class="stat-trend"><i class="fas fa-sync-alt fa-spin"></i> On Process</div>
+                </div>
+            </div>
+            <div class="stat-card stat-card-closed">
+                <div class="stat-icon-wrapper">
+                    <div class="stat-icon"><i class="fas fa-check-circle"></i></div>
+                </div>
+                <div class="stat-content">
+                    <div class="stat-label">CLOSED</div>
+                    <div class="stat-value" id="total-closed">0</div>
+                    <div class="stat-trend"><i class="fas fa-check-double"></i> Completed</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- FILTER SECTION -->
+        <div class="filter-section">
+            <div class="row g-4">
+                <div class="col-md-4">
+                    <div class="filter-label"><i class="fas fa-filter"></i> Status</div>
+                    <select id="filterStatus" class="form-select" onchange="applyFilters()">
+                        <option value="all">Semua Status</option>
+                        <option value="Open">Open</option>
+                        <option value="In Progress">In Progress</option>
+                        <option value="Closed">Closed</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <div class="filter-label"><i class="fas fa-user"></i> PIC</div>
+                    <select id="filterPIC" class="form-select" onchange="applyFilters()">
+                        <option value="all">Semua PIC</option>
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <div class="filter-label"><i class="fas fa-calendar"></i> Due Date</div>
+                    <select id="filterDue" class="form-select" onchange="applyFilters()">
+                        <option value="all">Semua</option>
+                        <option value="overdue">Overdue (Lewat)</option>
+                        <option value="warning">Mepet (H-3)</option>
+                        <option value="safe">Aman</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TABLE SECTION -->
+        <div class="table-wrapper">
+            <div class="p-3 d-flex justify-content-between align-items-center" style="border-bottom: 1px solid #333;">
+                <h5 class="mb-0" style="color: white;">
+                    <i class="fas fa-list-ul me-2" style="color: #c44a4a;"></i>
+                    Daftar Problem Material
+                </h5>
+                <div class="action-buttons">
+                    <div class="search-wrapper">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchBox" class="form-control" placeholder="Cari...">
+                    </div>
+                    <button class="btn-action" onclick="downloadExcel()" title="Download Excel">
+                        <i class="fas fa-file-excel"></i>
+                    </button>
+                    <button class="btn-action" onclick="downloadPDF()" title="Download PDF">
+                        <i class="fas fa-file-pdf"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="table-responsive">
+                <table id="problemTable" class="table">
+                    <thead>
+                        <tr>
+                            <th>No</th>
+                            <th>DENSO PN</th>
+                            <th>Part Name</th>
+                            <th>L/I</th>
+                            <th>Supplier</th>
+                            <th>Problem</th>
+                            <th>Timing</th>
+                            <th>Action</th>
+                            <th>Due Date</th>
+                            <th>PIC</th>
+                            <th>Note</th>
+                            <th>Status</th>
+                            <th style="border-right: none;"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="13" class="text-center py-5">
+                                <div style="color: #aaa;">
+                                    <i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #c44a4a;"></i>
+                                    <div>Loading data...</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div class="dashboard-footer">
+            <i class="fas fa-circle me-1" style="color: #8b3a3a; font-size: 8px;"></i>
+            FU Problem Material Control - PT Denso Indonesia
+            <i class="fas fa-circle ms-1" style="color: #8b3a3a; font-size: 8px;"></i>
+        </div>
+    </div>
+    
+    <!-- UPDATE MODAL -->
+    <div class="modal fade" id="updateModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title"><i class="fas fa-edit me-2"></i>Update Problem</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <form id="updateForm">
+                        <input type="hidden" id="updateRowId">
+                        <input type="hidden" id="updateOldData">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">DENSO PN</label>
+                                <input type="text" id="updateDensoPn" class="form-control" readonly>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Part Name</label>
+                                <input type="text" id="updatePartName" class="form-control" readonly>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Action <span style="color: #c44a4a;">*</span></label>
+                            <textarea id="updateAction" class="form-control" rows="2" required></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Due Date <span style="color: #c44a4a;">*</span></label>
+                                <input type="date" id="updateDueDate" class="form-control" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">PIC <span style="color: #c44a4a;">*</span></label>
+                                <input type="text" id="updatePic" class="form-control" required>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">Note/Remark</label>
+                            <textarea id="updateNote" class="form-control" rows="2"></textarea>
+                        </div>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Status <span style="color: #c44a4a;">*</span></label>
+                                <select id="updateStatus" class="form-control" required>
+                                    <option value="Open">Open</option>
+                                    <option value="In Progress">In Progress</option>
+                                    <option value="Closed">Closed</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label class="form-label">Alasan Update <span style="color: #c44a4a;">*</span></label>
+                                <input type="text" id="updateRemark" class="form-control" required>
+                            </div>
+                        </div>
+                    </form>
+                    <div class="mt-4">
+                        <h6 class="mb-3" style="color: white;"><i class="fas fa-history me-2" style="color: #c44a4a;"></i>Riwayat Update</h6>
+                        <div id="historyList" style="max-height: 200px; overflow-y: auto;">
+                            <p class="text-center py-3" style="color: #aaa;">Belum ada history update</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" style="background: #2a2a2a; border-color: #404040;" data-bs-dismiss="modal">Batal</button>
+                    <button type="button" class="btn" style="background: #8b3a3a; color: white; border: none;" onclick="saveUpdate()">Simpan Update</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPTS -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.7/js/dataTables.bootstrap5.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // ============================================
+        // KONFIGURASI - PASTE LINK FILE .TXT KAMU DI SINI
+        // ============================================
+        const TXT_URL = 'https://globaldenso.sharepoint.com/sites/AP000041/DNIA_Production_Control/Shared%20Documents/1.%20PC/1-1%20BEKASI/1-1-2%20MATERIAL%20CONTROL/FU-PROBLEM%20CONTROL/dashboard-data.txt';
+        
+        let allData = [];
+        let filteredData = [];
+        let dataTable;
+        let historyData = {};
+
+        // ============================================
+        // INIT
+        // ============================================
+        $(document).ready(function() {
+            loadDataFromTXT();
+            
+            setInterval(function() {
+                loadDataFromTXT(true);
+            }, 60000);
+            
+            $('#searchBox').on('keyup', function() {
+                if (dataTable) dataTable.search(this.value).draw();
+            });
+        });
+
+        // ============================================
+        // LOAD DATA DARI FILE .TXT
+        // ============================================
+        function loadDataFromTXT(silentMode = false) {
+            if (!silentMode) {
+                $('#tableBody').html('<tr><td colspan="13" class="text-center py-5"><div style="color: #aaa;"><i class="fas fa-spinner fa-spin fa-2x mb-3" style="color: #c44a4a;"></i><div>Loading data dari file TXT...</div></div></td></tr>');
+            }
+            
+            // Cache busting
+            const urlWithCache = TXT_URL + '?t=' + new Date().getTime();
+            
+            fetch(urlWithCache, {
+                credentials: 'include',
+                mode: 'cors',
+                cache: 'no-cache',
+                headers: {
+                    'Accept': 'text/plain',
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+                .then(response => {
+                    if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                    return response.text(); // Baca sebagai TEXT, bukan JSON
+                })
+                .then(text => {
+                    // Parse text jadi JSON
+                    const data = JSON.parse(text);
+                    console.log('Data received:', data);
+                    
+                    allData = data
+                        .filter(item => item.Id && item.Id !== '')
+                        .map((item, index) => ({
+                            id: index + 1,
+                            densoPn: item['DENSO PN'] || '-',
+                            partName: item['PART NAME'] || '-',
+                            localImport: item['LOCAL / IMPORT'] || '-',
+                            supplierName: item['SUPPLIER NAME '] || '-',
+                            problem: item['PROBLEM '] || '-',
+                            timingDate: item['TIMING DATE'] ? convertExcelDate(item['TIMING DATE']) : '-',
+                            action: item['ACTION'] || '-',
+                            dueDate: item['DUE DATE MAX'] ? convertExcelDate(item['DUE DATE MAX']) : '-',
+                            pic: item['PIC'] || '-',
+                            note: item['NOTE / REMARK'] || '-',
+                            status: item['STATUS'] || 'Open'
+                        }));
+                    
+                    filteredData = [...allData];
+                    
+                    $('#last-update').text(new Date().toLocaleString('id-ID'));
+                    $('#total-data').text(allData.length);
+                    
+                    updateStats();
+                    populatePICFilter();
+                    renderTable();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    if (!silentMode) {
+                        $('#tableBody').html(`
+                            <tr><td colspan="13" class="text-center py-5">
+                                <div style="color: #c44a4a;">
+                                    <i class="fas fa-exclamation-triangle fa-3x mb-3"></i>
+                                    <div>Gagal load data dari file TXT</div>
+                                    <div style="font-size:12px; margin-top:10px;">${error.message}</div>
+                                    <button class="btn btn-sm mt-3" style="background:#8b3a3a; color:white;" onclick="loadDataFromTXT()">Coba Lagi</button>
+                                </div>
+                            </td></tr>
+                        `);
+                    }
+                });
+        }
+
+        // ============================================
+        // FUNGSI-FUNGSI LAINNYA (SAMA PERSIS)
+        // ============================================
+        function convertExcelDate(excelDate) {
+            if (!excelDate || excelDate === '-') return '-';
+            const date = new Date((excelDate - 25569) * 86400 * 1000);
+            if (isNaN(date.getTime())) return excelDate;
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        function populatePICFilter() {
+            const pics = [...new Set(allData.map(item => item.pic).filter(p => p && p !== '-'))];
+            const select = $('#filterPIC');
+            select.html('<option value="all">Semua PIC</option>');
+            pics.forEach(pic => select.append(`<option value="${pic}">${pic}</option>`));
+        }
+
+        function applyFilters() {
+            const statusFilter = $('#filterStatus').val();
+            const picFilter = $('#filterPIC').val();
+            const dueFilter = $('#filterDue').val();
+            
+            filteredData = allData.filter(item => {
+                if (statusFilter !== 'all' && item.status !== statusFilter) return false;
+                if (picFilter !== 'all' && item.pic !== picFilter) return false;
+                if (dueFilter !== 'all') {
+                    const dueDate = parseDate(item.dueDate);
+                    if (!dueDate) return false;
+                    const today = new Date();
+                    today.setHours(0,0,0,0);
+                    const diffDays = Math.ceil((dueDate - today) / (1000*60*60*24));
+                    if (dueFilter === 'overdue' && diffDays >= 0) return false;
+                    if (dueFilter === 'warning' && (diffDays < 0 || diffDays > 3)) return false;
+                    if (dueFilter === 'safe' && diffDays <= 3) return false;
+                }
+                return true;
+            });
+            renderTable();
+        }
+
+        function parseDate(dateStr) {
+            if (!dateStr || dateStr === '-') return null;
+            try {
+                const parts = dateStr.split('/');
+                return (parts.length === 3) ? new Date(parts[2], parts[1]-1, parts[0]) : null;
+            } catch { return null; }
+        }
+
+        function getDueDateClass(dueDate) {
+            if (!dueDate || dueDate === '-') return '';
+            const date = parseDate(dueDate);
+            if (!date) return '';
+            const today = new Date(); today.setHours(0,0,0,0);
+            const diffDays = Math.ceil((date - today) / (1000*60*60*24));
+            if (diffDays < 0) return 'due-date-danger';
+            if (diffDays <= 3) return 'due-date-warning';
+            return 'due-date-success';
+        }
+
+        function getTimingClass(timingDate) {
+            if (!timingDate || timingDate === '-') return '';
+            try {
+                const parts = timingDate.split(' ');
+                if (parts.length >= 1) {
+                    const dateParts = parts[0].split('/');
+                    if (dateParts.length === 3) {
+                        const date = new Date(dateParts[2], dateParts[1]-1, dateParts[0]);
+                        const today = new Date(); today.setHours(0,0,0,0);
+                        if (date < today) return 'timing-past';
+                        if (date.getTime() === today.getTime()) return 'timing-today';
+                    }
+                }
+            } catch {}
+            return '';
+        }
+
+        function updateStats() {
+            let open=0, progress=0, closed=0;
+            allData.forEach(item => {
+                if (item.status === 'Open') open++;
+                else if (item.status === 'In Progress') progress++;
+                else if (item.status === 'Closed') closed++;
+            });
+            $('#total-problem').text(allData.length);
+            $('#total-open').text(open);
+            $('#total-progress').text(progress);
+            $('#total-closed').text(closed);
+        }
+
+        function renderTable() {
+            if ($.fn.DataTable.isDataTable('#problemTable')) $('#problemTable').DataTable().destroy();
+            $('#tableBody').empty();
+            
+            filteredData.forEach(item => {
+                const dueDateClass = getDueDateClass(item.dueDate);
+                const timingClass = getTimingClass(item.timingDate);
+                let statusBadge = item.status === 'Open' ? 'badge-open' : (item.status === 'In Progress' ? 'badge-progress' : 'badge-closed');
+                
+                let dueDateDisplay = dueDateClass ? `<span class="due-date-badge ${dueDateClass}">${item.dueDate}</span>` : item.dueDate;
+                let timingDisplay = timingClass ? `<span class="timing-badge ${timingClass}">${item.timingDate}</span>` : item.timingDate;
+                
+                $('#tableBody').append(`<tr>
+                    <td>${item.id}</td>
+                    <td><span style="color:white; font-weight:500;">${item.densoPn}</span></td>
+                    <td>${item.partName}</td>
+                    <td>${item.localImport}</td>
+                    <td>${item.supplierName}</td>
+                    <td>${item.problem}</td>
+                    <td>${timingDisplay}</td>
+                    <td>${item.action}</td>
+                    <td>${dueDateDisplay}</td>
+                    <td>${item.pic}</td>
+                    <td>${item.note}</td>
+                    <td><span class="badge-status ${statusBadge}">${item.status}</span></td>
+                    <td style="border-right:none;"><button class="btn-edit" onclick="openUpdateModal(${item.id})"><i class="fas fa-pen"></i></button></td>
+                </tr>`);
+            });
+            
+            dataTable = $('#problemTable').DataTable({
+                pageLength: 25,
+                order: [[0, 'desc']],
+                language: { url: 'https://cdn.datatables.net/plug-ins/1.13.7/i18n/id.json' },
+                dom: '<"row"<"col-sm-12 col-md-5"i><"col-sm-12 col-md-7"p>>rt'
+            });
+        }
+
+        function openUpdateModal(id) {
+            const item = allData.find(d => d.id === id);
+            if (!item) return;
+            $('#updateRowId').val(id);
+            $('#updateOldData').val(JSON.stringify(item));
+            $('#updateDensoPn').val(item.densoPn);
+            $('#updatePartName').val(item.partName);
+            $('#updateAction').val(item.action);
+            if (item.dueDate && item.dueDate !== '-') {
+                const parts = item.dueDate.split('/');
+                $('#updateDueDate').val(`${parts[2]}-${parts[1]}-${parts[0]}`);
+            } else $('#updateDueDate').val('');
+            $('#updatePic').val(item.pic);
+            $('#updateNote').val(item.note);
+            $('#updateStatus').val(item.status);
+            $('#updateRemark').val('');
+            displayHistory(id);
+            $('#updateModal').modal('show');
+        }
+
+        function displayHistory(id) {
+            const history = historyData[id] || [];
+            let html = '';
+            if (history.length === 0) html = '<p class="text-center py-3" style="color:#aaa;">Belum ada history update</p>';
+            else {
+                history.slice().reverse().forEach(h => {
+                    html += `<div class="history-item"><div style="font-size:11px; color:#aaa;">${h.timestamp} <i class="far fa-user ms-3 me-1"></i>${h.user}</div><div style="font-weight:600; color:#c44a4a;">Update: ${h.field}</div><div style="font-size:12px; color:#aaa;"><i class="far fa-sticky-note me-1"></i>${h.remark}</div></div>`;
+                });
+            }
+            $('#historyList').html(html);
+        }
+
+        function saveUpdate() {
+            const id = parseInt($('#updateRowId').val());
+            const oldData = JSON.parse($('#updateOldData').val());
+            const newAction = $('#updateAction').val();
+            const newDueDate = $('#updateDueDate').val();
+            const newPic = $('#updatePic').val();
+            const newNote = $('#updateNote').val();
+            const newStatus = $('#updateStatus').val();
+            const remark = $('#updateRemark').val();
+            
+            if (!newAction || !newDueDate || !newPic || !newStatus || !remark) {
+                Swal.fire({ icon: 'warning', title: 'Peringatan', text: 'Semua field wajib diisi!', background: '#1a1a1a', color: 'white' });
+                return;
+            }
+            
+            const dueDateParts = newDueDate.split('-');
+            const formattedDueDate = `${dueDateParts[2]}/${dueDateParts[1]}/${dueDateParts[0]}`;
+            const itemIndex = allData.findIndex(d => d.id === id);
+            if (itemIndex === -1) return;
+            
+            const changes = [];
+            if (oldData.action !== newAction) changes.push('Action');
+            if (oldData.dueDate !== formattedDueDate) changes.push('Due Date');
+            if (oldData.pic !== newPic) changes.push('PIC');
+            if (oldData.note !== newNote) changes.push('Note');
+            if (oldData.status !== newStatus) changes.push('Status');
+            
+            if (!historyData[id]) historyData[id] = [];
+            historyData[id].push({ timestamp: new Date().toLocaleString('id-ID'), user: 'Admin', field: changes.join(', '), remark: remark });
+            
+            allData[itemIndex].action = newAction;
+            allData[itemIndex].dueDate = formattedDueDate;
+            allData[itemIndex].pic = newPic;
+            allData[itemIndex].note = newNote;
+            allData[itemIndex].status = newStatus;
+            
+            filteredData = [...allData];
+            updateStats();
+            populatePICFilter();
+            applyFilters();
+            $('#updateModal').modal('hide');
+            Swal.fire({ icon: 'success', title: 'Berhasil!', text: 'Data berhasil diupdate', timer: 1500, background: '#1a1a1a', color: 'white' });
+        }
+
+        function downloadExcel() {
+            const wb = XLSX.utils.book_new();
+            const wsData = [
+                ['FU PROBLEM MATERIAL CONTROL'],
+                [`Generated: ${new Date().toLocaleString('id-ID')}`],
+                [],
+                ['No','DENSO PN','Part Name','L/I','Supplier','Problem','Timing/Date','Action','Due Date','PIC','Note/Remark','Status']
+            ];
+            filteredData.forEach(item => wsData.push([item.id, item.densoPn, item.partName, item.localImport, item.supplierName, item.problem, item.timingDate, item.action, item.dueDate, item.pic, item.note, item.status]));
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            ws['!merges'] = [{ s: { r:0, c:0 }, e: { r:0, c:11 } }];
+            XLSX.utils.book_append_sheet(wb, ws, 'FU Problem Material');
+            XLSX.writeFile(wb, `FU_Problem_Material_${new Date().toISOString().slice(0,10)}.xlsx`);
+        }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('landscape', 'mm', 'a4');
+            doc.setFillColor(139,58,58); doc.rect(0,0,297,8,'F');
+            doc.setFont('helvetica','bold'); doc.setFontSize(20); doc.setTextColor(139,58,58); doc.text('FU PROBLEM MATERIAL CONTROL',35,22);
+            doc.setFont('helvetica','normal'); doc.setFontSize(10); doc.setTextColor(100,100,100); doc.text('PT Denso Indonesia - Manufacturing Division',35,28);
+            doc.autoTable({
+                head: [['No','DENSO PN','Part Name','L/I','Supplier','Problem','Timing','Action','Due Date','PIC','Note','Status']],
+                body: filteredData.map(item => [item.id, item.densoPn, item.partName, item.localImport, item.supplierName, item.problem, item.timingDate, item.action, item.dueDate, item.pic, item.note, item.status]),
+                startY: 35,
+                styles: { fontSize:8, cellPadding:2 },
+                headStyles: { fillColor:[139,58,58], textColor:255 }
+            });
+            doc.save(`FU_Problem_Material_${new Date().toISOString().slice(0,10)}.pdf`);
+        }
+    </script>
+</body>
+</html>
