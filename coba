@@ -1,1 +1,41 @@
-const JSON_URL = 'https://globaldenso.sharepoint.com/sites/AP000041/DNIA_Production_Control/Shared%20Documents/1.%20PC/1-1%20BEKASI/1-1-2%20MATERIAL%20CONTROL/FU-PROBLEM%20CONTROL/dashboard-data.json';
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+Tracking Prevention blocked access to storage for <URL>.
+index.html:1  Access to fetch at 'https://globaldenso.sharepoint.com/sites/AP000041/DNIA_Production_Control/Shared%20Documents/1.%20PC/1-1%20BEKASI/1-1-2%20MATERIAL%20CONTROL/FU-PROBLEM%20CONTROL/dashboard-data.json' from origin 'null' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
+globaldenso.sharepoint.com/sites/AP000041/DNIA_Production_Control/Shared%20Documents/1.%20PC/1-1%20BEKASI/1-1-2%20MATERIAL%20CONTROL/FU-PROBLEM%20CONTROL/dashboard-data.json:1   Failed to load resource: net::ERR_FAILED
+index.html:1037  Error: TypeError: Failed to fetch
+    at loadDataFromJSON (index.html:996:13)
+    at HTMLDocument.<anonymous> (index.html:973:13)
+    at e (jquery-3.7.1.min.js:2:27028)
+    at t (jquery-3.7.1.min.js:2:27330)
+(anonymous) @ index.html:1037
+[NEW] Explain Console errors by using Copilot in Edge: click
+         
+         to explain an error. 
+        Learn more
+        Don't show again
